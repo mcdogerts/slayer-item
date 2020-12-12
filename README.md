@@ -13,4 +13,5 @@ Here is an example of the player overlay working with the task being automatical
 [![Image from Gyazo](https://i.gyazo.com/82a23bfd5d33e131f2a7b30e00ebb2c8.gif)](https://gyazo.com/82a23bfd5d33e131f2a7b30e00ebb2c8)
 
 Settings:
+
 [![Image from Gyazo](https://i.gyazo.com/e4304ca4b6a7ffc90d5b86d70ef9a4d2.png)](https://gyazo.com/e4304ca4b6a7ffc90d5b86d70ef9a4d2)
