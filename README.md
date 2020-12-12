@@ -5,11 +5,11 @@ There are 3 types of notifications. A player overlay, a chat notification, and a
 The player overlay will show the required item above your player character. For Instances where multiple items can work, the plugin will check for all the applicable items. For instance if the current task is set to Banshee it will show a pair of earmuffs above the player. If you then obtain a slayer helmet the overlay will disappear because a slayer helmet will provide protection against a Banshee. 
 
 
-#Plugin Settings:
+# Plugin Settings:
 
 [![Image from Gyazo](https://i.gyazo.com/e4304ca4b6a7ffc90d5b86d70ef9a4d2.png)](https://gyazo.com/e4304ca4b6a7ffc90d5b86d70ef9a4d2)
 
-#Examples
+# Examples
 
 Here is an example of the player overlay working with the task being manually selected.
 
