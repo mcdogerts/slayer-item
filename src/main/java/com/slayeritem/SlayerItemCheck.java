@@ -1,6 +1,9 @@
 package com.slayeritem;
 
+<<<<<<< HEAD
 import com.google.errorprone.annotations.Var;
+=======
+>>>>>>> origin/master
 import com.google.inject.Inject;
 import com.google.inject.Provides;
 import lombok.extern.slf4j.Slf4j;
@@ -64,8 +67,12 @@ public class SlayerItemCheck extends Plugin
 	private String currentTaskName;
 	private ArrayList<Integer> taskItems = new ArrayList<>();
 	private String taskCounter;
+<<<<<<< HEAD
 	private boolean overlayActive;
 	private int kourendVar;
+=======
+	private boolean overlayActive;;
+>>>>>>> origin/master
 
 	@Override
 	protected void startUp() throws Exception {
@@ -93,7 +100,10 @@ public class SlayerItemCheck extends Plugin
 		{
 			case HOPPING:
 			case LOGGING_IN:
+<<<<<<< HEAD
 				kourendVar = client.getVar(Varbits.DIARY_KOUREND_ELITE);
+=======
+>>>>>>> origin/master
 			case LOGGED_IN:
 				lastNotification = Instant.now().plusSeconds(config.initDelay());
 				break;
@@ -165,6 +175,7 @@ public class SlayerItemCheck extends Plugin
 
 	private void createNotification(){
 		currentTask = getSlayerTask();
+<<<<<<< HEAD
 
 		if(currentTask != null && (currentTask.getTaskItems()[0] > 0)) {
 			if (currentTask != previousTask) {
@@ -198,6 +209,36 @@ public class SlayerItemCheck extends Plugin
 
 				}
 			} else {
+=======
+		if(currentTask != null && (currentTask.getTaskItems()[0] > 0)) {
+			if(currentTask != previousTask){
+				buildItemList(currentTask);
+				previousTask = currentTask;
+			}
+			if (!(checkInventories(taskItems))) {
+				delayDuration = Duration.ofSeconds(config.notificationDelay());
+				if (config.showOverlay() && !overlayActive) {
+					overlayManager.add(overlay);
+					overlayActive = true;
+				}
+
+				if (config.sendChat()) {
+					if (lastNotification != null && Instant.now().compareTo(lastNotification.plus(delayDuration)) >= 0) {
+						sendChatMessage("You don't have the required item for your " + config.currentTask().toString().replace("_", " ").toLowerCase() + " task.");
+						if (!(config.playSound())) {
+							lastNotification = Instant.now();
+						}
+					}
+				}
+				if (config.playSound()) {
+					if (lastNotification != null && Instant.now().compareTo(lastNotification.plus(delayDuration)) >= 0) {
+
+						client.playSoundEffect(config.notificationSound().getId(), SoundEffectVolume.HIGH);
+						lastNotification = Instant.now();
+					}
+				}
+			} else if (overlayActive) {
+>>>>>>> origin/master
 				overlayManager.remove(overlay);
 				overlayActive = false;
 			}
