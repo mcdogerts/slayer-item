@@ -143,11 +143,16 @@ public class SlayerItemCheck extends Plugin {
 	}
 
 	private boolean checkInventories(ArrayList<Integer> items) {
+		log.error("GOT TO CHECK INV");
 		for (Integer i : items) {
+			log.error("CURRENT ITEM ID = " + i);
 			if (client.getItemContainer(InventoryID.INVENTORY).contains(i) || client.getItemContainer(InventoryID.EQUIPMENT).contains(i)) {
+				log.error("WAS TRUE");
 				return true;
 			}
+
 		}
+		log.error("WAS FALSE");
 		return false;
 	}
 
@@ -190,47 +195,15 @@ public class SlayerItemCheck extends Plugin {
 						}
 					}
 				} else if (overlayActive) {
+					overlayManager.remove(overlay);
+					overlayActive = false;
 
 				}
 			} else {
-
-				if (currentTask != null && (currentTask.getTaskItems()[0] > 0)) {
-					if (currentTask != previousTask) {
-						buildItemList(currentTask);
-						previousTask = currentTask;
-					}
-					if (!(checkInventories(taskItems))) {
-						delayDuration = Duration.ofSeconds(config.notificationDelay());
-						if (config.showOverlay() && !overlayActive) {
-							overlayManager.add(overlay);
-							overlayActive = true;
-						}
-
-						if (config.sendChat()) {
-							if (lastNotification != null && Instant.now().compareTo(lastNotification.plus(delayDuration)) >= 0) {
-								sendChatMessage("You don't have the required item for your " + config.currentTask().toString().replace("_", " ").toLowerCase() + " task.");
-								if (!(config.playSound())) {
-									lastNotification = Instant.now();
-								}
-							}
-						}
-						if (config.playSound()) {
-							if (lastNotification != null && Instant.now().compareTo(lastNotification.plus(delayDuration)) >= 0) {
-
-								client.playSoundEffect(config.notificationSound().getId(), SoundEffectVolume.HIGH);
-								lastNotification = Instant.now();
-							}
-						}
-					} else if (overlayActive) {
-						overlayManager.remove(overlay);
-						overlayActive = false;
-					}
-				}
+				overlayManager.remove(overlay);
+				overlayActive = false;
 			}
-
-
 		}
-
 	}
 
 	private void sendChatMessage(String chatMessage) {
