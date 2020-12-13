@@ -143,16 +143,11 @@ public class SlayerItemCheck extends Plugin {
 	}
 
 	private boolean checkInventories(ArrayList<Integer> items) {
-		log.error("GOT TO CHECK INV");
 		for (Integer i : items) {
-			log.error("CURRENT ITEM ID = " + i);
 			if (client.getItemContainer(InventoryID.INVENTORY).contains(i) || client.getItemContainer(InventoryID.EQUIPMENT).contains(i)) {
-				log.error("WAS TRUE");
 				return true;
 			}
-
 		}
-		log.error("WAS FALSE");
 		return false;
 	}
 
