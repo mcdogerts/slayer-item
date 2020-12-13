@@ -90,7 +90,7 @@ public class SlayerItemCheck extends Plugin {
 			case HOPPING:
 			case LOGGING_IN:
 				kourendVar = client.getVar(Varbits.DIARY_KOUREND_ELITE);
-
+				break;
 			case LOGGED_IN:
 				lastNotification = Instant.now().plusSeconds(config.initDelay());
 				break;
