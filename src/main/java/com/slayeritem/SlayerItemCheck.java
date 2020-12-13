@@ -1,5 +1,6 @@
 package com.slayeritem;
 
+import com.google.errorprone.annotations.Var;
 import com.google.inject.Inject;
 import com.google.inject.Provides;
 import lombok.extern.slf4j.Slf4j;
@@ -63,7 +64,8 @@ public class SlayerItemCheck extends Plugin
 	private String currentTaskName;
 	private ArrayList<Integer> taskItems = new ArrayList<>();
 	private String taskCounter;
-	private boolean overlayActive;;
+	private boolean overlayActive;
+	private int kourendVar;
 
 	@Override
 	protected void startUp() throws Exception {
@@ -91,6 +93,7 @@ public class SlayerItemCheck extends Plugin
 		{
 			case HOPPING:
 			case LOGGING_IN:
+				kourendVar = client.getVar(Varbits.DIARY_KOUREND_ELITE);
 			case LOGGED_IN:
 				lastNotification = Instant.now().plusSeconds(config.initDelay());
 				break;
@@ -162,34 +165,39 @@ public class SlayerItemCheck extends Plugin
 
 	private void createNotification(){
 		currentTask = getSlayerTask();
+
 		if(currentTask != null && (currentTask.getTaskItems()[0] > 0)) {
-			if(currentTask != previousTask){
+			if (currentTask != previousTask) {
 				buildItemList(currentTask);
 				previousTask = currentTask;
 			}
-			if (!(checkInventories(taskItems))) {
-				delayDuration = Duration.ofSeconds(config.notificationDelay());
-				if (config.showOverlay() && !overlayActive) {
-					overlayManager.add(overlay);
-					overlayActive = true;
-				}
+			if (!(kourendVar == 1 && currentTask.getTaskItems()[0] == ItemID.BOOTS_OF_STONE)) {
+				if (!(checkInventories(taskItems))) {
+					delayDuration = Duration.ofSeconds(config.notificationDelay());
+					if (config.showOverlay() && !overlayActive) {
+						overlayManager.add(overlay);
+						overlayActive = true;
+					}
 
-				if (config.sendChat()) {
-					if (lastNotification != null && Instant.now().compareTo(lastNotification.plus(delayDuration)) >= 0) {
-						sendChatMessage("You don't have the required item for your " + config.currentTask().toString().replace("_", " ").toLowerCase() + " task.");
-						if (!(config.playSound())) {
+					if (config.sendChat()) {
+						if (lastNotification != null && Instant.now().compareTo(lastNotification.plus(delayDuration)) >= 0) {
+							sendChatMessage("You don't have the required item for your " + config.currentTask().toString().replace("_", " ").toLowerCase() + " task.");
+							if (!(config.playSound())) {
+								lastNotification = Instant.now();
+							}
+						}
+					}
+					if (config.playSound()) {
+						if (lastNotification != null && Instant.now().compareTo(lastNotification.plus(delayDuration)) >= 0) {
+
+							client.playSoundEffect(config.notificationSound().getId(), SoundEffectVolume.HIGH);
 							lastNotification = Instant.now();
 						}
 					}
-				}
-				if (config.playSound()) {
-					if (lastNotification != null && Instant.now().compareTo(lastNotification.plus(delayDuration)) >= 0) {
+				} else if (overlayActive) {
 
-						client.playSoundEffect(config.notificationSound().getId(), SoundEffectVolume.HIGH);
-						lastNotification = Instant.now();
-					}
 				}
-			} else if (overlayActive) {
+			} else {
 				overlayManager.remove(overlay);
 				overlayActive = false;
 			}
