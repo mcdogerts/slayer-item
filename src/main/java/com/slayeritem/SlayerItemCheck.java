@@ -1,9 +1,5 @@
 package com.slayeritem;
 
-<<<<<<< HEAD
-import com.google.errorprone.annotations.Var;
-=======
->>>>>>> origin/master
 import com.google.inject.Inject;
 import com.google.inject.Provides;
 import lombok.extern.slf4j.Slf4j;
@@ -34,8 +30,7 @@ import java.util.Arrays;
 		description = "Checks inventory and equipment for item need for slayer monsters.",
 		tags = {"slayer", "item"}
 )
-public class SlayerItemCheck extends Plugin
-{
+public class SlayerItemCheck extends Plugin {
 	@Provides
 	SlayerItemCheckConfig provideSlayerItemConfig(ConfigManager configManager) {
 		return configManager.getConfig(SlayerItemCheckConfig.class);
@@ -67,12 +62,8 @@ public class SlayerItemCheck extends Plugin
 	private String currentTaskName;
 	private ArrayList<Integer> taskItems = new ArrayList<>();
 	private String taskCounter;
-<<<<<<< HEAD
 	private boolean overlayActive;
 	private int kourendVar;
-=======
-	private boolean overlayActive;;
->>>>>>> origin/master
 
 	@Override
 	protected void startUp() throws Exception {
@@ -94,16 +85,12 @@ public class SlayerItemCheck extends Plugin
 	}
 
 	@Subscribe
-	public void onGameStateChanged(GameStateChanged event)
-	{
-		switch (event.getGameState())
-		{
+	public void onGameStateChanged(GameStateChanged event) {
+		switch (event.getGameState()) {
 			case HOPPING:
 			case LOGGING_IN:
-<<<<<<< HEAD
 				kourendVar = client.getVar(Varbits.DIARY_KOUREND_ELITE);
-=======
->>>>>>> origin/master
+
 			case LOGGED_IN:
 				lastNotification = Instant.now().plusSeconds(config.initDelay());
 				break;
@@ -112,8 +99,8 @@ public class SlayerItemCheck extends Plugin
 
 	@Subscribe
 	public void onGameTick(GameTick tick) {
-		if(!(config.manualTask())) {
-			if(pluginManager.isPluginEnabled(new SlayerPlugin()) && configManager.getConfig(SlayerConfig.class).showInfobox()) {
+		if (!(config.manualTask())) {
+			if (pluginManager.isPluginEnabled(new SlayerPlugin()) && configManager.getConfig(SlayerConfig.class).showInfobox()) {
 				taskCounter = "Counter(count=" + configManager.getConfig(SlayerConfig.class).amount() + ")";
 				if (infoBoxManager.getInfoBoxes().toString().contains(taskCounter)) {
 					setTask(configManager.getConfig(SlayerConfig.class).taskName());
@@ -122,21 +109,21 @@ public class SlayerItemCheck extends Plugin
 					overlayManager.remove(overlay);
 					overlayActive = false;
 				}
-			} else if (Instant.now().compareTo(lastLog.plus(logDelay)) >= 0 ){ //Help reduce log spam
+			} else if (Instant.now().compareTo(lastLog.plus(logDelay)) >= 0) { //Help reduce log spam
 				lastLog = Instant.now();
 				log.info("Slayer plugin and Task Infobox needs to be enabled to gather current slayer task automatically.");
-			} else{
+			} else {
 				overlayManager.remove(overlay);
 				overlayActive = false;
 			}
 
-		} else if(config.manualTask()){
+		} else if (config.manualTask()) {
 			createNotification();
 		}
 	}
 
 	public Task getSlayerTask() {
-		if(!(config.manualTask())) {
+		if (!(config.manualTask())) {
 			currentTaskName = configManager.getConfig(SlayerConfig.class).taskName().toLowerCase();
 		} else {
 			currentTaskName = config.currentTask().toString().toLowerCase();
@@ -150,34 +137,31 @@ public class SlayerItemCheck extends Plugin
 		return null;
 	}
 
-	private void buildItemList(Task task){
+	private void buildItemList(Task task) {
 		taskItems.clear();
 		Arrays.stream(task.getTaskItems()).forEach(taskItems::add);
 	}
 
 	private boolean checkInventories(ArrayList<Integer> items) {
-		for (Integer i : items){
-			if (client.getItemContainer(InventoryID.INVENTORY).contains(i) || client.getItemContainer(InventoryID.EQUIPMENT).contains(i)){
+		for (Integer i : items) {
+			if (client.getItemContainer(InventoryID.INVENTORY).contains(i) || client.getItemContainer(InventoryID.EQUIPMENT).contains(i)) {
 				return true;
 			}
 		}
 		return false;
 	}
 
-	private void setTask(String task)
-	{
+	private void setTask(String task) {
 		for (Task t : Task.values()) {
-			if(task.contains(t.getName(t))){
+			if (task.contains(t.getName(t))) {
 				configManager.setConfiguration("slayeritem", "task", t);
 			}
 		}
 	}
 
-	private void createNotification(){
+	private void createNotification() {
 		currentTask = getSlayerTask();
-<<<<<<< HEAD
-
-		if(currentTask != null && (currentTask.getTaskItems()[0] > 0)) {
+		if (currentTask != null && (currentTask.getTaskItems()[0] > 0)) {
 			if (currentTask != previousTask) {
 				buildItemList(currentTask);
 				previousTask = currentTask;
@@ -209,44 +193,47 @@ public class SlayerItemCheck extends Plugin
 
 				}
 			} else {
-=======
-		if(currentTask != null && (currentTask.getTaskItems()[0] > 0)) {
-			if(currentTask != previousTask){
-				buildItemList(currentTask);
-				previousTask = currentTask;
-			}
-			if (!(checkInventories(taskItems))) {
-				delayDuration = Duration.ofSeconds(config.notificationDelay());
-				if (config.showOverlay() && !overlayActive) {
-					overlayManager.add(overlay);
-					overlayActive = true;
-				}
 
-				if (config.sendChat()) {
-					if (lastNotification != null && Instant.now().compareTo(lastNotification.plus(delayDuration)) >= 0) {
-						sendChatMessage("You don't have the required item for your " + config.currentTask().toString().replace("_", " ").toLowerCase() + " task.");
-						if (!(config.playSound())) {
-							lastNotification = Instant.now();
+				if (currentTask != null && (currentTask.getTaskItems()[0] > 0)) {
+					if (currentTask != previousTask) {
+						buildItemList(currentTask);
+						previousTask = currentTask;
+					}
+					if (!(checkInventories(taskItems))) {
+						delayDuration = Duration.ofSeconds(config.notificationDelay());
+						if (config.showOverlay() && !overlayActive) {
+							overlayManager.add(overlay);
+							overlayActive = true;
 						}
-					}
-				}
-				if (config.playSound()) {
-					if (lastNotification != null && Instant.now().compareTo(lastNotification.plus(delayDuration)) >= 0) {
 
-						client.playSoundEffect(config.notificationSound().getId(), SoundEffectVolume.HIGH);
-						lastNotification = Instant.now();
+						if (config.sendChat()) {
+							if (lastNotification != null && Instant.now().compareTo(lastNotification.plus(delayDuration)) >= 0) {
+								sendChatMessage("You don't have the required item for your " + config.currentTask().toString().replace("_", " ").toLowerCase() + " task.");
+								if (!(config.playSound())) {
+									lastNotification = Instant.now();
+								}
+							}
+						}
+						if (config.playSound()) {
+							if (lastNotification != null && Instant.now().compareTo(lastNotification.plus(delayDuration)) >= 0) {
+
+								client.playSoundEffect(config.notificationSound().getId(), SoundEffectVolume.HIGH);
+								lastNotification = Instant.now();
+							}
+						}
+					} else if (overlayActive) {
+						overlayManager.remove(overlay);
+						overlayActive = false;
 					}
 				}
-			} else if (overlayActive) {
->>>>>>> origin/master
-				overlayManager.remove(overlay);
-				overlayActive = false;
 			}
+
+
 		}
+
 	}
 
-	private void sendChatMessage(String chatMessage)
-	{
+	private void sendChatMessage(String chatMessage) {
 		final String message = new ChatMessageBuilder()
 				.append(ChatColorType.HIGHLIGHT)
 				.append(chatMessage)
