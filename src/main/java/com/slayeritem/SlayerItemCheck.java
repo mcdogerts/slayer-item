@@ -60,9 +60,11 @@ public class SlayerItemCheck extends Plugin {
 	private Task currentTask;
 	private Task previousTask;
 	private String currentTaskName;
-	private ArrayList<Integer> taskItems = new ArrayList<>();
 	private String taskCounter;
+	private ArrayList<Integer> taskItems = new ArrayList<>();
 	private boolean overlayActive;
+	private boolean invNull;
+	private boolean equipNull;
 	private int kourendVar;
 
 	@Override
@@ -89,9 +91,8 @@ public class SlayerItemCheck extends Plugin {
 		switch (event.getGameState()) {
 			case HOPPING:
 			case LOGGING_IN:
-				kourendVar = client.getVar(Varbits.DIARY_KOUREND_ELITE);
-				break;
 			case LOGGED_IN:
+				kourendVar = client.getVar(Varbits.DIARY_KOUREND_ELITE);
 				lastNotification = Instant.now().plusSeconds(config.initDelay());
 				break;
 		}
@@ -143,21 +144,23 @@ public class SlayerItemCheck extends Plugin {
 	}
 
 	private boolean checkInventories(ArrayList<Integer> items) {
-		if(checkInvNull() && !(checkEquipNull())){
+		invNull = checkInvNull();
+		equipNull = checkEquipNull();
+		if(invNull && !equipNull){
 			for (Integer i : items) {
 				if (client.getItemContainer(InventoryID.EQUIPMENT).contains(i)){
 					return true;
 				}
 			}
 			return false;
-		} else if(!(checkInvNull()) && checkEquipNull()){
+		} else if(!invNull && equipNull){
 			for (Integer i : items) {
 				if (client.getItemContainer(InventoryID.INVENTORY).contains(i)){
 					return true;
 				}
 			}
 			return false;
-		} else if (!(checkInvNull()) && !(checkEquipNull())){
+		} else if (!invNull && !equipNull){
 			for (Integer i : items) {
 				if (client.getItemContainer(InventoryID.EQUIPMENT).contains(i) || client.getItemContainer(InventoryID.EQUIPMENT).contains(i)) {
 					return true;
