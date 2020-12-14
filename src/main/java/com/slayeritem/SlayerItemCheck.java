@@ -143,10 +143,42 @@ public class SlayerItemCheck extends Plugin {
 	}
 
 	private boolean checkInventories(ArrayList<Integer> items) {
-		for (Integer i : items) {
-			if (client.getItemContainer(InventoryID.INVENTORY).contains(i) || client.getItemContainer(InventoryID.EQUIPMENT).contains(i)) {
-				return true;
+		if(checkInvNull() && !(checkEquipNull())){
+			for (Integer i : items) {
+				if (client.getItemContainer(InventoryID.EQUIPMENT).contains(i)){
+					return true;
+				}
 			}
+			return false;
+		} else if(!(checkInvNull()) && checkEquipNull()){
+			for (Integer i : items) {
+				if (client.getItemContainer(InventoryID.INVENTORY).contains(i)){
+					return true;
+				}
+			}
+			return false;
+		} else if (!(checkInvNull()) && !(checkEquipNull())){
+			for (Integer i : items) {
+				if (client.getItemContainer(InventoryID.EQUIPMENT).contains(i) || client.getItemContainer(InventoryID.EQUIPMENT).contains(i)) {
+					return true;
+				}
+			}
+			return false;
+		} else {
+			return false;
+		}
+	}
+
+	public boolean checkInvNull(){
+		if(client.getItemContainer(InventoryID.INVENTORY) == null) {
+			return true;
+		}
+		return false;
+	}
+
+	public boolean checkEquipNull(){
+		if(client.getItemContainer(InventoryID.EQUIPMENT) == null) {
+			return true;
 		}
 		return false;
 	}
