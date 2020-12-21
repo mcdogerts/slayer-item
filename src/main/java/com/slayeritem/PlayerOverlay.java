@@ -35,7 +35,7 @@ public class PlayerOverlay extends Overlay {
     @Override
     public Dimension render(Graphics2D graphics) {
 
-        currentTask = plugin.getSlayerTask();
+        currentTask = plugin.getTaskFromList();
         if(currentTask == null){
             return null;
         }
@@ -58,7 +58,6 @@ public class PlayerOverlay extends Overlay {
     }
 
     private void renderItem(Graphics2D graphics, BufferedImage image) {
-        //render the item
         LocalPoint playerPos = client.getLocalPlayer().getLocalLocation();
         int offset = client.getLocalPlayer().getLogicalHeight() + OFFSET;
 
