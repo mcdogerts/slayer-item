@@ -30,6 +30,7 @@ import java.util.Arrays;
 		description = "Checks inventory and equipment for item need for slayer monsters.",
 		tags = {"slayer", "item"}
 )
+@PluginDependency(SlayerPlugin.class)
 public class SlayerItemCheck extends Plugin {
 	@Provides
 	SlayerItemCheckConfig provideSlayerItemConfig(ConfigManager configManager) {
@@ -52,6 +53,8 @@ public class SlayerItemCheck extends Plugin {
 	private PlayerOverlay overlay;
 	@Inject
 	private PluginManager pluginManager;
+	@Inject
+	private SlayerPlugin slayerPlugin;
 
 
 	private Instant lastNotification;
@@ -62,7 +65,6 @@ public class SlayerItemCheck extends Plugin {
 	private final ArrayList<Integer> taskItems = new ArrayList<>();
 	private boolean overlayActive;
 	private int kourendVar;
-	private Plugin slayerPlugin = new SlayerPlugin();
 
 	@Override
 	protected void startUp() throws Exception {
