@@ -53,29 +53,26 @@ public class SlayerItemCheck extends Plugin {
 	@Inject
 	private PluginManager pluginManager;
 
+
 	private Instant lastNotification;
 	private Instant lastLog;
 	private Duration delayDuration;
-	private Duration logDelay = Duration.ofMinutes(1);
-	private Task currentTask;
+	private final Duration logDelay = Duration.ofMinutes(2);
 	private Task previousTask;
-	private String currentTaskName;
-	private String taskCounter;
-	private ArrayList<Integer> taskItems = new ArrayList<>();
+	private final ArrayList<Integer> taskItems = new ArrayList<>();
 	private boolean overlayActive;
-	private boolean invNull;
-	private boolean equipNull;
 	private int kourendVar;
+	private Plugin slayerPlugin = new SlayerPlugin();
 
 	@Override
 	protected void startUp() throws Exception {
 		lastLog = Instant.now();
 		delayDuration = Duration.ofSeconds(config.notificationDelay());
 
-		if (!(config.manualTask())) {
+		if (!config.manualTask()) {
 			setTask(configManager.getConfig(SlayerConfig.class).taskName());
 		}
-		if (!(config.showOverlay())) {
+		if (!config.showOverlay()) {
 			overlayActive = false;
 		}
 	}
@@ -100,36 +97,32 @@ public class SlayerItemCheck extends Plugin {
 
 	@Subscribe
 	public void onGameTick(GameTick tick) {
-		if (!(config.manualTask())) {
-			if (pluginManager.isPluginEnabled(new SlayerPlugin()) && configManager.getConfig(SlayerConfig.class).showInfobox()) {
-				taskCounter = "Counter(count=" + configManager.getConfig(SlayerConfig.class).amount() + ")";
-				if (infoBoxManager.getInfoBoxes().toString().contains(taskCounter)) {
-					setTask(configManager.getConfig(SlayerConfig.class).taskName());
+		if (!config.manualTask()) {
+			if (pluginManager.isPluginEnabled(slayerPlugin)){
+				String taskName = configManager.getConfig(SlayerConfig.class).taskName();
+				if(taskName != null){
+					setTask(taskName);
 					createNotification();
-				} else if (overlayActive) {
-					overlayManager.remove(overlay);
-					overlayActive = false;
 				}
 			} else if (Instant.now().compareTo(lastLog.plus(logDelay)) >= 0) { //Help reduce log spam
 				lastLog = Instant.now();
-				log.info("Slayer plugin and Task Infobox needs to be enabled to gather current slayer task automatically.");
+				log.info("Slayer plugin needs to be enabled to gather current slayer task automatically.");
 			} else {
 				overlayManager.remove(overlay);
 				overlayActive = false;
 			}
-
 		} else if (config.manualTask()) {
 			createNotification();
 		}
 	}
 
-	public Task getSlayerTask() {
+	public Task getTaskFromList() {
+		String currentTaskName;
 		if (!(config.manualTask())) {
 			currentTaskName = configManager.getConfig(SlayerConfig.class).taskName().toLowerCase();
 		} else {
 			currentTaskName = config.currentTask().toString().toLowerCase();
 		}
-
 		for (Task t : Task.values()) {
 			if (currentTaskName.contains(t.name().toLowerCase())) {
 				return t;
@@ -144,8 +137,8 @@ public class SlayerItemCheck extends Plugin {
 	}
 
 	private boolean checkInventories(ArrayList<Integer> items) {
-		invNull = checkInvNull();
-		equipNull = checkEquipNull();
+		boolean invNull = checkInvNull();
+		boolean equipNull = checkEquipNull();
 		if(invNull && !equipNull){
 			for (Integer i : items) {
 				if (client.getItemContainer(InventoryID.EQUIPMENT).contains(i)){
@@ -162,7 +155,7 @@ public class SlayerItemCheck extends Plugin {
 			return false;
 		} else if (!invNull && !equipNull){
 			for (Integer i : items) {
-				if (client.getItemContainer(InventoryID.EQUIPMENT).contains(i) || client.getItemContainer(InventoryID.EQUIPMENT).contains(i)) {
+				if (client.getItemContainer(InventoryID.INVENTORY).contains(i) || client.getItemContainer(InventoryID.EQUIPMENT).contains(i)) {
 					return true;
 				}
 			}
@@ -173,17 +166,11 @@ public class SlayerItemCheck extends Plugin {
 	}
 
 	public boolean checkInvNull(){
-		if(client.getItemContainer(InventoryID.INVENTORY) == null) {
-			return true;
-		}
-		return false;
+		return client.getItemContainer(InventoryID.INVENTORY) == null;
 	}
 
 	public boolean checkEquipNull(){
-		if(client.getItemContainer(InventoryID.EQUIPMENT) == null) {
-			return true;
-		}
-		return false;
+		return client.getItemContainer(InventoryID.EQUIPMENT) == null;
 	}
 
 	private void setTask(String task) {
@@ -195,20 +182,28 @@ public class SlayerItemCheck extends Plugin {
 	}
 
 	private void createNotification() {
-		currentTask = getSlayerTask();
+		Task currentTask = getTaskFromList();
 		if (currentTask != null && (currentTask.getTaskItems()[0] > 0)) {
+			//stops from building the item list multiple times if the slayer task hasn't changed
 			if (currentTask != previousTask) {
 				buildItemList(currentTask);
 				previousTask = currentTask;
 			}
+			//Won't send any notifications if Kourend Elite is complete
 			if (!(kourendVar == 1 && currentTask.getTaskItems()[0] == ItemID.BOOTS_OF_STONE)) {
-				if (!(checkInventories(taskItems))) {
+				if (!checkInventories(taskItems)) {
 					delayDuration = Duration.ofSeconds(config.notificationDelay());
+
+					//Player Overlay
 					if (config.showOverlay() && !overlayActive) {
 						overlayManager.add(overlay);
 						overlayActive = true;
+					} else if (!config.showOverlay() && overlayActive){
+						overlayManager.remove(overlay);
+						overlayActive = false;
 					}
 
+					//Chat notification
 					if (config.sendChat()) {
 						if (lastNotification != null && Instant.now().compareTo(lastNotification.plus(delayDuration)) >= 0) {
 							sendChatMessage("You don't have the required item for your " + config.currentTask().toString().replace("_", " ").toLowerCase() + " task.");
@@ -217,9 +212,10 @@ public class SlayerItemCheck extends Plugin {
 							}
 						}
 					}
+
+					//Sound notification
 					if (config.playSound()) {
 						if (lastNotification != null && Instant.now().compareTo(lastNotification.plus(delayDuration)) >= 0) {
-
 							client.playSoundEffect(config.notificationSound().getId(), SoundEffectVolume.HIGH);
 							lastNotification = Instant.now();
 						}
@@ -227,7 +223,6 @@ public class SlayerItemCheck extends Plugin {
 				} else if (overlayActive) {
 					overlayManager.remove(overlay);
 					overlayActive = false;
-
 				}
 			} else {
 				overlayManager.remove(overlay);
