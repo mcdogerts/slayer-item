@@ -13,9 +13,9 @@ The player overlay will show the required item above your player character. For 
 
 Here is an example of the player overlay working with the task being manually selected.
 
-[![Image from Gyazo](https://i.gyazo.com/5a763ff438c6e3154d31b17143c2d736.gif)](https://gyazo.com/5a763ff438c6e3154d31b17143c2d736)
+![Example1](https://media.giphy.com/media/WnZLvBJHxXsdSTwACI/giphy.gif)
 
 Here is an example of the player overlay working with the task being automatically confgiured.
 
-[![Image from Gyazo](https://i.gyazo.com/82a23bfd5d33e131f2a7b30e00ebb2c8.gif)](https://gyazo.com/82a23bfd5d33e131f2a7b30e00ebb2c8)
+![Example2](https://media.giphy.com/media/KJMjB1QaLrWrYRoycj/giphy.gif)
 
